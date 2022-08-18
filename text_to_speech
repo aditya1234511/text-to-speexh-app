@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Js Web Speech API</title>
+    <style>
+        body {
+            width: 100%;
+            height: 100vh;
+        }
+ 
+        form {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+ 
+        form * {
+            width: 50%;
+        }
+ 
+        textarea {
+            height: 250px;
+        }
+ 
+        h1 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <form>
+        <h1>Text To Speech App</h1>
+        <select></select>
+        <textarea></textarea>
+        <input type="submit" value="Speak!">
+        <button type="button">Pause</button>
+        <button type="button">Resume</button>
+        <button type="button">Stop</button>
+    </form>
+    <script>
+        let voices;
+        let form = document.forms[0];
+        if ("speechSynthesis" in window) {
+            speechSynthesis.onvoiceschanged = () => {
+ 
+                voices = speechSynthesis.getVoices();
+                voices.map(voice => {
+                    form[0].innerHTML += `
+                    <option>${voice.name}</option>
+                    `;
+                })
+ 
+                console.log(voices);
+            }
+            form.addEventListener("submit", e => {
+                e.preventDefault()
+                let selected = form[0].querySelector("option:checked").value;
+                let t2s = new SpeechSynthesisUtterance();
+                t2s.text = form[1].value;
+                let voice = voices.filter(v => {
+                    return v.name == selected;
+                })
+                t2s.voice = voice[0];
+                speechSynthesis.cancel();
+                speechSynthesis.speak(t2s)
+            })
+ 
+        } else {
+            alert("unsupported")
+        }
+        form[3].addEventListener("click", e => {
+            speechSynthesis.pause()
+        })
+        form[4].addEventListener("click", e => {
+            speechSynthesis.resume()
+        })
+        form[5].addEventListener("click", e => {
+            speechSynthesis.cancel();
+        })
+    </script>
+   
+</body>
+</html>
